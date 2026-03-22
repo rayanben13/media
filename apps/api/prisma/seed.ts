@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma'; // حسب المسار الذي حددته في generator output
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 

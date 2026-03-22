@@ -2,15 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Post {
+type Comment {
   id: Int!
-  slug: String!
-  title: String!
   content: String!
-  thumbnail: String
-  published: Boolean!
+  postId: Int!
+  user: UserEntity!
   createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 """
@@ -18,35 +15,166 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type User {
-  """Example field (placeholder)"""
-  exampleField: Int!
+type PaginatedComments {
+  comments: [Comment!]!
+  total: Int!
+  hasNextPage: Boolean!
+}
+
+type Like {
+  id: Int!
+  userId: Int!
+  postId: Int!
+  createdAt: DateTime!
+}
+
+type LikeStatus {
+  isLiked: Boolean!
+  totalLikes: Int!
+}
+
+type PostLikeStatus {
+  postId: Int!
+  isLiked: Boolean!
+  totalLikes: Int!
+}
+
+type Tag {
+  id: Int!
+  name: String!
+  posts: [Post!]!
+}
+
+type Post {
+  id: Int!
+  slug: String!
+  title: String!
+  content: String!
+  thumbnail: String
+  user: UserEntity!
+  comments: [Comment!]!
+  likes: [Like!]!
+  tag: [Tag!]!
+  published: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserEntity {
+  id: Int!
+  name: String!
+  email: String!
+  bio: String
+  avatar: String
+  posts: [Post!]
+  comments: [Comment!]
+  likes: [Like!]!
+}
+
+type UserRespo {
+  id: Float!
+  name: String!
+  email: String!
+  role: String!
+  avatar: String
+}
+
+type AuthResponse {
+  user: UserRespo!
+  accessToken: String!
+}
+
+type PaginatedPosts {
+  posts: [Post!]!
+  total: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
 }
 
 type Query {
-  post: [Post!]!
-  user(id: Int!): User!
+  posts(take: Int = 10, skip: Int = 0): PaginatedPosts!
+  post(id: Int!): Post!
+  userPosts(userId: Int!, take: Int = 10, skip: Int = 0): PaginatedPosts!
+  myPosts(take: Int = 10, skip: Int = 0): PaginatedPosts!
+  user(id: Int!): UserEntity!
+  comments(postId: Int!, take: Int = 4, skip: Int = 0): PaginatedComments!
+  tags: [Tag!]!
+  tag(id: Int!): Tag!
+  likeStatus(postId: Int!, userId: Int): LikeStatus!
+  likeStatusBatch(postIds: [Int!]!, userId: Int): [PostLikeStatus!]!
 }
 
 type Mutation {
-  createPost(createPostInput: CreatePostInput!): Post!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  createPost(input: CreatePostInput!): Post!
+  updatePost(input: UpdatePostInput!): Post!
+  deletePost(id: Int!): Post!
+  createUser(createUserInput: CreateUserInput!): UserEntity!
+  updateUser(updateUserInput: UpdateUserInput!): UserEntity!
+  removeUser(id: Int!): UserEntity!
+  createComment(input: CreateCommentInput!): Comment!
+  createTag(createTagInput: CreateTagInput!): Tag!
+  updateTag(updateTagInput: UpdateTagInput!): Tag!
+  removeTag(id: Int!): Tag!
+  toggleLike(postId: Int!): LikeStatus!
+  login(loginInput: LoginInput!): AuthResponse!
+  signUp(input: SignupInput!): AuthResponse!
 }
 
 input CreatePostInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  title: String!
+  content: String!
+  thumbnail: String
+  published: Boolean! = false
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  thumbnail: String
+  published: Boolean = false
+  id: Int!
 }
 
 input CreateUserInput {
+  name: String
+  email: String!
+  password: String!
+  bio: String
+  avatar: String
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  password: String
+  bio: String
+  avatar: String
+  id: Int!
+}
+
+input CreateCommentInput {
+  content: String!
+  postId: Int!
+}
+
+input CreateTagInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateUserInput {
+input UpdateTagInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input SignupInput {
+  name: String!
+  email: String!
+  password: String!
 }

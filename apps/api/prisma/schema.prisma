@@ -5,16 +5,29 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+ enum Role {
+  USER
+  ADMIN
+}
+
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
 }
 
 model User {
   id       Int     @id @default(autoincrement())
   name     String
   email    String  @unique
-  password String
+  password String?
+  role Role @default(USER)
   bio      String?
   avatar   String?
+    provider  AuthProvider @default(LOCAL)
+  providerId String?
 
   posts    Post[]
   comments Comment[]
@@ -41,6 +54,8 @@ model Post {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
 }
 
 model Comment {
@@ -55,6 +70,8 @@ model Comment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
 }
 
 model Tag {
@@ -74,4 +91,7 @@ model Like {
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
+   @@index([postId])
 }
+
+
